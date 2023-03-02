@@ -85,7 +85,7 @@ def main(argv=None):
         if args["debug"]:
             print(dot_parser.get_sbom()["relationships"])
 
-        sbom_dot = DOTGenerator()
+        sbom_dot = DOTGenerator(dot_parser.get_sbom()["packages"])
         sbom_dot.generatedot(dot_parser.get_sbom()["relationships"])
         dot_out = SBOMOutput(args["output_file"], "dot")
         dot_out.generate_output(sbom_dot.getDOT())

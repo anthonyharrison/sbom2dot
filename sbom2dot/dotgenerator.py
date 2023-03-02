@@ -1,16 +1,18 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import string
+
 
 class DOTGenerator:
-    def __init__(self):
+    def __init__(self, package_data):
         self.dot = []
+        self.package_data = package_data
 
     def getDOT(self):
         return self.dot
 
     def show(self, text):
-        # print (text)
         self.dot.append(text)
 
     def get_package(self, package_id):
@@ -21,14 +23,24 @@ class DOTGenerator:
             # Find package name after package number n
             startpos = len(prefix) + 1
             return package_id[package_id[startpos:].find("-") + startpos + 1:]
-        elif "-" in package_id:
+        elif "-" in package_id and package_id[0] in string.digits:
             # Format is n-<package>
             return package_id[package_id.find("-") + 1:]
         return package_id
 
+    def get_license(self, package_id):
+        for package in self.package_data:
+            the_package = self.package_data[package]
+            if the_package.get("name") == package_id:
+                return the_package.get("licenseconcluded", "")
+        return ""
+
     def set_colour(self, colour):
         base = " [shape=box, style=filled, fontcolor=white, fillcolor="
-        return base + colour + "];"
+        return base + colour
+
+    def set_label(self, label):
+        return f'label="{self.get_package(label)}\n{self.get_license(self.get_package(label))}"'
 
     def generatedot(self, data):
 
@@ -43,6 +55,7 @@ class DOTGenerator:
         implicit_style = self.set_colour("darkgreen")
         root_style = self.set_colour("darkred")
         packages = []
+        root_found = False
         for element in data:
             source = element["source"]
             dest = element["target"]
@@ -50,29 +63,36 @@ class DOTGenerator:
 
             lib = '"' + self.get_package(source) + '"'
             application = '"' + self.get_package(dest) + '"'
+            lib_label = self.set_label(source)
+            application_label = self.set_label(dest)
 
-            if relationship == " DESCRIBES ":
+            if not root_found and "DESCRIBES" in relationship:
                 # Should only be one DESCRIBES relationship.
                 root = application
+                root_found = True
             else:
                 if lib == root:
                     if lib not in packages:
                         packages.append(lib)
-                        self.show("\t" + lib + root_style)
+                        self.show(f"\t{lib}{root_style} {lib_label}];")
                     if application not in packages:
                         packages.append(application)
-                        self.show("\t" + application + explicit_style)
+                        self.show(
+                            f"\t{application}{explicit_style} {application_label}];"
+                        )
                 elif application == root:
                     if lib not in packages:
                         packages.append(lib)
-                        self.show("\t" + lib + explicit_style)
+                        self.show(f"\t{lib}{explicit_style} {lib_label}];")
                 else:
                     if lib not in packages:
                         packages.append(lib)
-                        self.show("\t" + lib + implicit_style)
+                        self.show(f"\t{lib}{implicit_style} {lib_label}];")
                     if application not in packages:
                         packages.append(application)
-                        self.show("\t" + application + implicit_style)
+                        self.show(
+                            f"\t{application}{implicit_style} {application_label}];"
+                        )
                 if lib != application:
                     self.show("\t" + lib + " -> " + application + ";")
         self.show("}")
