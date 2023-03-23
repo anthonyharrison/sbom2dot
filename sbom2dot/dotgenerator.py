@@ -22,10 +22,10 @@ class DOTGenerator:
             # Format is SPDXRef-Package-n-<package>
             # Find package name after package number n
             startpos = len(prefix) + 1
-            return package_id[package_id[startpos:].find("-") + startpos + 1:]
+            return package_id[package_id[startpos:].find("-") + startpos + 1 :]
         elif "-" in package_id and package_id[0] in string.digits:
             # Format is n-<package>
-            return package_id[package_id.find("-") + 1:]
+            return package_id[package_id.find("-") + 1 :]
         return package_id
 
     def get_license(self, package_id):
