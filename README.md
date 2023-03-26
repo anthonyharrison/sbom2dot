@@ -2,7 +2,7 @@
 
 SBOM2DOT generates a dependency graph of the components within an SBOM (Software Bill of Materials). The format of the graph
 file is compatible with the [DOT language](https://graphviz.org/doc/info/lang.html) used by the
-[GraphViz](https://graphviz.org/) application. SBOMS are supported in a number of formats including
+[GraphViz](https://graphviz.org/) application. SBOMs are supported in a number of formats including
 [SPDX](https://www.spdx.org) and [CycloneDX](https://www.cyclonedx.org).
 
 ## Installation
