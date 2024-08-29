@@ -40,7 +40,11 @@ class DOTGenerator:
         return base + colour
 
     def set_label(self, label):
-        return f'label="{self.get_package(label)}\n{self.get_license(self.get_package(label))}"'
+        license_label = self.get_license(self.get_package(label))
+        if len(license_label) > 0:
+            return f'label="{self.get_package(label)}\n{license_label}"'
+        else:
+            return f'label="{self.get_package(label)}"'
 
     def generatedot(self, data):
 
@@ -66,34 +70,41 @@ class DOTGenerator:
             lib_label = self.set_label(source)
             application_label = self.set_label(dest)
 
-            if not root_found and "DESCRIBES" in relationship:
-                # Should only be one DESCRIBES relationship.
+            # if not root_found and "DESCRIBES" in relationship:
+            # if "DESCRIBES" in relationship:
+            #     # Should probably only be one DESCRIBES relationship.
+            #     root = application
+                #root_found = True
+            #else:
+            if not root_found:
                 root = application
                 root_found = True
+            if lib == root:
+                if lib not in packages:
+                    packages.append(lib)
+                    self.show(f"\t{lib}{root_style} {lib_label}];")
+                    root_found = True
+                elif application not in packages:
+                    packages.append(application)
+                    # if root_found:
+                    self.show(
+                        f"\t{application}{explicit_style} {application_label}];"
+                    )
+            elif application == root:
+                if lib not in packages:
+                    packages.append(lib)
+                    #if root_found:
+                    self.show(f"\t{lib}{explicit_style} {lib_label}];")
             else:
-                if lib == root:
-                    if lib not in packages:
-                        packages.append(lib)
-                        self.show(f"\t{lib}{root_style} {lib_label}];")
-                    if application not in packages:
-                        packages.append(application)
-                        self.show(
-                            f"\t{application}{explicit_style} {application_label}];"
-                        )
-                elif application == root:
-                    if lib not in packages:
-                        packages.append(lib)
-                        self.show(f"\t{lib}{explicit_style} {lib_label}];")
-                else:
-                    if lib not in packages:
-                        packages.append(lib)
-                        self.show(f"\t{lib}{implicit_style} {lib_label}];")
-                    if application not in packages:
-                        packages.append(application)
-                        self.show(
-                            f"\t{application}{implicit_style} {application_label}];"
-                        )
-                if lib != application:
-                    self.show("\t" + lib + " -> " + application + ";")
+                if lib not in packages:
+                    packages.append(lib)
+                    self.show(f"\t{lib}{implicit_style} {lib_label}];")
+                if application not in packages:
+                    packages.append(application)
+                    self.show(
+                        f"\t{application}{implicit_style} {application_label}];"
+                    )
+            if lib != application and root_found:
+                self.show("\t" + lib + " -> " + application + ";")
         self.show("}")
         # end
