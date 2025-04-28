@@ -83,6 +83,7 @@ def main(argv=None):
         dot_parser.parse_file(input_file)
 
         if args["debug"]:
+            print(dot_parser.get_sbom()["packages"])
             print(dot_parser.get_sbom()["relationships"])
 
         sbom_dot = DOTGenerator(dot_parser.get_sbom()["packages"])
