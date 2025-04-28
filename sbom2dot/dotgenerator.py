@@ -95,15 +95,14 @@ class DOTGenerator:
                     packages.append(lib)
                     #if root_found:
                     self.show(f"\t{lib}{explicit_style} {lib_label}];")
-            else:
-                if lib not in packages:
-                    packages.append(lib)
-                    self.show(f"\t{lib}{implicit_style} {lib_label}];")
-                if application not in packages:
-                    packages.append(application)
-                    self.show(
-                        f"\t{application}{implicit_style} {application_label}];"
-                    )
+            if lib not in packages:
+                packages.append(lib)
+                self.show(f"\t{lib}{implicit_style} {lib_label}];")
+            if application not in packages:
+                packages.append(application)
+                self.show(
+                    f"\t{application}{implicit_style} {application_label}];"
+                )
             if lib != application and root_found:
                 self.show("\t" + lib + " -> " + application + ";")
         self.show("}")
